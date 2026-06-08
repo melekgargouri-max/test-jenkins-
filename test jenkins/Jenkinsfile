@@ -22,16 +22,19 @@ pipeline {
         stage('3. Build de l\'image Docker') {
             steps {
                 echo 'Construction de l\'image...'
-                sh 'docker build -t mon-app-test:latest .'
+                // Remplacement de 'sh' par 'bat'
+                bat 'docker build -t mon-app-test:latest .'
             }
         }
 
         stage('4. Déploiement Local') {
             steps {
                 echo 'Lancement du conteneur...'
-                // Supprime l'ancien conteneur de test s'il existe, puis lance le nouveau
-                sh 'docker stop app-test-instance || true && docker rm app-test-instance || true'
-                sh 'docker run -d --name app-test-instance -p 8085:8080 mon-app-test:latest'
+                // Remplacement de 'sh' par 'bat'
+                // Sous Windows, le "|| true" devient "2>nul || ver >nul" pour ignorer l'erreur si le conteneur n'existe pas
+                bat 'docker stop app-test-instance 2>nul || ver >nul'
+                bat 'docker rm app-test-instance 2>nul || ver >nul'
+                bat 'docker run -d --name app-test-instance -p 8085:8080 mon-app-test:latest'
             }
         }
     }
