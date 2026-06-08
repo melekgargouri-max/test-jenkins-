@@ -19,14 +19,13 @@ pipeline {
             }
         }
 
-        stage('3. Build de l\'image Docker') {
+       stage('3. Build de l\'image Docker') {
             steps {
                 echo 'Construction de l\'image...'
-                // Remplacement de 'sh' par 'bat'
-                bat 'docker build -t mon-app-test:latest .'
+                // On indique à Docker de chercher la recette dans le dossier 'test jenkins'
+                bat 'docker build -t mon-app-test:latest "./test jenkins"'
             }
         }
-
         stage('4. Déploiement Local') {
             steps {
                 echo 'Lancement du conteneur...'
