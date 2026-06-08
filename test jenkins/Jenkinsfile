@@ -2,39 +2,45 @@ pipeline {
     agent any
 
     stages {
-        stage('1. Préparation') {
+        stage('1. Récupération du Code') {
             steps {
-                echo 'Nettoyage du workspace...'
-                cleanWs()
+                echo 'Récupération des fichiers depuis Git...'
+                // Force Jenkins à récupérer le code de GitHub dans le workspace
+                checkout scm
             }
         }
 
         stage('2. Analyse SonarQube') {
             steps {
-                // Remplacez 'MonSonarLocal' par le nom exact donné dans Jenkins
                 withSonarQubeEnv('MonSonarLocal') {
                     echo 'Simulating SonarQube Scan...'
-                    // Pour un vrai projet Node, on installerait le sonar-scanner
                 }
             }
         }
 
-       stage('3. Build de l\'image Docker') {
+        stage('3. Build de l\'image Docker') {
             steps {
                 echo 'Construction de l\'image...'
-                // On indique à Docker de chercher la recette dans le dossier 'test jenkins'
-                bat 'docker build -t mon-app-test:latest "./test jenkins"'
+                // On utilise "test jenkins" sans le ./ devant pour Windows
+                bat 'docker build -t mon-app-test:latest "test jenkins"'
             }
         }
+
         stage('4. Déploiement Local') {
             steps {
                 echo 'Lancement du conteneur...'
-                // Remplacement de 'sh' par 'bat'
-                // Sous Windows, le "|| true" devient "2>nul || ver >nul" pour ignorer l'erreur si le conteneur n'existe pas
+                // Nettoyage et lancement sous Windows
                 bat 'docker stop app-test-instance 2>nul || ver >nul'
                 bat 'docker rm app-test-instance 2>nul || ver >nul'
                 bat 'docker run -d --name app-test-instance -p 8085:8080 mon-app-test:latest'
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Nettoyage final du workspace...'
+            cleanWs()
         }
     }
 }
