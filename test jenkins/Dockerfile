@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Installe Express (la seule dépendance)
-RUN npm install express
+RUN npm install
 
 # Copie le reste du code
 COPY server.js .
